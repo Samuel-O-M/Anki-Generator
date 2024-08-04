@@ -24,14 +24,29 @@ def categorize(word, language="Russian"):
 
     tags = ["Noun", "Verb", "Adjective", "Adverb", "Pronoun", "Numeral"]
 
-    matchingTags = [t for t in tags if t in targetSection]
+
+    # Find the first (most common) use of the word
     
-    if len(matchingTags) == 1:
-        return matchingTags[0].lower()
-    elif len(matchingTags) > 1:
-        return "error"
-    else:
+    tag_positions = {t: targetSection.find(t) for t in tags if t in targetSection}
+    
+    if not tag_positions:
         return "other"
+    
+    min_position_tag = min(tag_positions, key=tag_positions.get)
+    
+    return min_position_tag.lower()
+
+
+    # Find all uses of the word
+
+    # matchingTags = [t for t in tags if t in targetSection]
+    
+    # if len(matchingTags) == 1:
+    #     return matchingTags[0].lower()
+    # elif len(matchingTags) > 1:
+    #     return "error"
+    # else:
+    #     return "other"
 
 if __name__ == "__main__":
 
