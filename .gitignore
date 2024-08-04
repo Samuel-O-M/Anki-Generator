@@ -1,4 +1,11 @@
+# Cache
 __pycache__/
 scrappers/__pycache__/
+
+# Variables
 .env
+
+# Other
+data/
 russian/
+input.txt
