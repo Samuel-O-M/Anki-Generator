@@ -186,9 +186,31 @@ Do you want to proceed? (y/n): """)
     if name == "":
         name = "deck"
     
+    tlang = ""
+    while tlang == "":
+        tlang = input("Enter the target language: ")
+        if tlang == "":
+            print("Target language is required.")
+        if tlang.lower() == "exit":
+            exit()
+    tlang = tlang[0].upper() + tlang[1:].lower()
+
+    langa = ""
+    while langa == "":
+        langa = input("Enter the first language: ")
+        if langa == "":
+            print("First language is required.")
+        if langa.lower() == "exit":
+            exit()
+    langa = langa[0].upper() + langa[1:].lower()
+    
+    langb = input("Enter the second language: ")
+    if langb.lower() == "exit":
+        exit()
+    langb = langb[0].upper() + langb[1:].lower()
+    
 
 
-    # INITIALIZATION
     # for i in range(1,501):
     #     word = Word(i)
     #     word.initialize(driver)
