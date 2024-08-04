@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def categorize(word):      
+def categorize(word, language="Russian"):      
         
     url = 'https://en.wiktionary.org/wiki/' + word
     response = requests.get(url)
@@ -12,16 +12,19 @@ def categorize(word):
 
     sections = soup.split("catlinks")[0].split("mw-heading2")
 
-    russianSection = None
+    targetSection = None
 
     for i in range(1, len(sections)):
-        if 'id="Russian"' in sections[i]:
-            russianSection = sections[i]
+        if f'id="{language}"' in sections[i]:
+            targetSection = sections[i]
             break
+
+    if targetSection == None:
+        return "word not found"
 
     tags = ["Noun", "Verb", "Adjective", "Adverb", "Pronoun", "Numeral"]
 
-    matchingTags = [t for t in tags if t in russianSection]
+    matchingTags = [t for t in tags if t in targetSection]
     
     if len(matchingTags) == 1:
         return matchingTags[0].lower()

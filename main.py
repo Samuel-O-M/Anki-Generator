@@ -1,23 +1,10 @@
-from scrappers.stressMark import *
-from scrappers.frequencyList import *
-from scrappers.wikitionary import *
 from flashcardCreator import *
 from chatGPTapi import *
 import random
 import json
 import os
+import re
 
-# def get_top(n):
-#     n = str(n)    
-#     with open('data/top.json', 'r', encoding='utf-8') as file:
-#         data = json.load(file)
-#     return data.get(n, "Key not found")
-
-# def get_top_s(n):
-#     n = str(n)    
-#     with open('data/top_s.json', 'r', encoding='utf-8') as file:
-#         data = json.load(file)
-#     return data.get(n, "Key not found")
 
 class Word:
     def __init__(self, top):
@@ -32,18 +19,18 @@ class Word:
             with open('data/cards.json', 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 if isinstance(self._top, str) and self._top in data:
-                    self._ru = data[self._top].get("ru", "")
-                    self.en = data[self._top].get("en", "")
-                    self.es = data[self._top].get("es", "")
-                    self.xru1 = data[self._top].get("xru1", "")
-                    self.xru2 = data[self._top].get("xru2", "")
-                    self.xru3 = data[self._top].get("xru3", "")
-                    self.xen1 = data[self._top].get("xen1", "")
-                    self.xen2 = data[self._top].get("xen2", "")
-                    self.xen3 = data[self._top].get("xen3", "")
-                    self.xes1 = data[self._top].get("xes1", "")
-                    self.xes2 = data[self._top].get("xes2", "")
-                    self.xes3 = data[self._top].get("xes3", "")
+                    self._tlang = data[self._top].get("tlang", "")
+                    self.langa = data[self._top].get("langa", "")
+                    self.langb = data[self._top].get("langb", "")
+                    self.xtlang1 = data[self._top].get("xtlang1", "")
+                    self.xtlang2 = data[self._top].get("xtlang2", "")
+                    self.xtlang3 = data[self._top].get("xtlang3", "")
+                    self.xlanga1 = data[self._top].get("xlanga1", "")
+                    self.xlanga2 = data[self._top].get("xlanga2", "")
+                    self.xlanga3 = data[self._top].get("xlanga3", "")
+                    self.xlangb1 = data[self._top].get("xlangb1", "")
+                    self.xlangb2 = data[self._top].get("xlangb2", "")
+                    self.xlangb3 = data[self._top].get("xlangb3", "")
                     self._tag = data[self._top].get("tag", "")
                 else:
                     self.clear()
@@ -54,7 +41,7 @@ class Word:
 
     def initialize(self, driver):
         word, category = rank(self.top)
-        self._ru = stress_mark(word, driver)
+        self._tlang = stress_mark(word, driver)
 
         if category == "other" and (categorize(word) == "pronoun" or categorize(word) == "error"):
             self._tag = "error"
@@ -62,18 +49,18 @@ class Word:
             self._tag = category
     
     def clear(self):
-        self._ru = ""
-        self.en = ""
-        self.es = ""
-        self.xru1 = ""
-        self.xru2 = ""
-        self.xru3 = ""
-        self.xen1 = ""
-        self.xen2 = ""
-        self.xen3 = ""
-        self.xes1 = ""
-        self.xes2 = ""
-        self.xes3 = ""
+        self._tlang = ""
+        self.langa = ""
+        self.langb = ""
+        self.xtlang1 = ""
+        self.xtlang2 = ""
+        self.xtlang3 = ""
+        self.xlanga1 = ""
+        self.xlanga2 = ""
+        self.xlanga3 = ""
+        self.xlangb1 = ""
+        self.xlangb2 = ""
+        self.xlangb3 = ""
         self._tag = ""
     
     @property
@@ -81,8 +68,8 @@ class Word:
         return self._top
     
     @property
-    def ru(self):
-        return self._ru
+    def tlang(self):
+        return self._tlang
     
     @property
     def tag(self):
@@ -96,18 +83,18 @@ class Word:
             data = {}
 
         data[self._top] = {
-            "ru": self.ru,
-            "en": self.en,
-            "es": self.es,
-            "xru1": self.xru1,
-            "xru2": self.xru2,
-            "xru3": self.xru3,
-            "xen1": self.xen1,
-            "xen2": self.xen2,
-            "xen3": self.xen3,
-            "xes1": self.xes1,
-            "xes2": self.xes2,
-            "xes3": self.xes3,
+            "tlang": self.tlang,
+            "langa": self.langa,
+            "langb": self.langb,
+            "xtlang1": self.xtlang1,
+            "xtlang2": self.xtlang2,
+            "xtlang3": self.xtlang3,
+            "xlanga1": self.xlanga1,
+            "xlanga2": self.xlanga2,
+            "xlanga3": self.xlanga3,
+            "xlangb1": self.xlangb1,
+            "xlangb2": self.xlangb2,
+            "xlangb3": self.xlangb3,
             "tag": self.tag
         }
 
@@ -176,11 +163,30 @@ Example:
 
     return prompt
 
+def normalize_input(input_string):
+    elements = re.split(r'[,\s]+', input_string)
+    elements = [elem.strip('"') for elem in elements if elem]
+    return elements
 
 
 
 
 if __name__ == "__main__":
+
+    # INPUT
+    words = normalize_input(input("Enter the words to process: "))
+    proceed = input(f"""
+The following words will be processed: {words}
+Do you want to proceed? (y/n): """)
+    
+    if proceed.lower() != "y":
+        exit()
+
+    name = input("Enter the name of the deck: ")
+    if name == "":
+        name = "deck"
+    
+
 
     # INITIALIZATION
     # for i in range(1,501):
@@ -194,7 +200,7 @@ if __name__ == "__main__":
     # for i in range(483,484):
     #     word = Word(i)
 
-    #     prompt = get_prompt(word.ru, word.tag)
+    #     prompt = get_prompt(word.tlang, word.tag)
 
     #     response = ask(prompt)
 
@@ -202,17 +208,17 @@ if __name__ == "__main__":
         
     #     data_array = data_row.split("|")
 
-    #     word.en = data_array[2].strip()
-    #     word.es = data_array[3].strip()
-    #     word.xru1 = data_array[4].strip()
-    #     word.xru2 = data_array[5].strip()
-    #     word.xru3 = data_array[6].strip()
-    #     word.xen1 = data_array[7].strip()
-    #     word.xen2 = data_array[8].strip()
-    #     word.xen3 = data_array[9].strip()
-    #     word.xes1 = data_array[10].strip()
-    #     word.xes2 = data_array[11].strip()
-    #     word.xes3 = data_array[12].strip()
+    #     word.langa = data_array[2].strip()
+    #     word.langb = data_array[3].strip()
+    #     word.xtlang1 = data_array[4].strip()
+    #     word.xtlang2 = data_array[5].strip()
+    #     word.xtlang3 = data_array[6].strip()
+    #     word.xlanga1 = data_array[7].strip()
+    #     word.xlanga2 = data_array[8].strip()
+    #     word.xlanga3 = data_array[9].strip()
+    #     word.xlangb1 = data_array[10].strip()
+    #     word.xlangb2 = data_array[11].strip()
+    #     word.xlangb3 = data_array[12].strip()
 
     #     word.update()
 
@@ -223,49 +229,52 @@ if __name__ == "__main__":
     # table = []
     # for i in range(1,501):
     #     word = Word(i)
-    #     row = [word.top, word.ru, "", word.en, word.es, word.xru1, word.xru2, word.xru3, "", "", "", word.xen1, word.xen2, word.xen3, word.xes1, word.xes2, word.xes3, word.tag]
+    #     row = [word.top, word.tlang, "", word.langa, word.langb, word.xtlang1, word.xtlang2, word.xtlang3, "", "", "", word.xlanga1, word.xlanga2, word.xlanga3, word.xlangb1, word.xlangb2, word.xlangb3, word.tag]
     #     table.append(row)
 
     # create_flashcards(table)
 
     # STRESS MARKS
-    driver = setup_driver()
-    for i in range(1,501):
+#     driver = setup_driver()
+#     for i in range(1,501):
 
-        word = Word(i)
-        word.xru1 = stress_mark(word.xru1, driver)
-        word.xru2 = stress_mark(word.xru2, driver)
-        word.xru3 = stress_mark(word.xru3, driver)
+#         word = Word(i)
+#         word.xtlang1 = stress_mark(word.xtlang1, driver)
+#         word.xtlang2 = stress_mark(word.xtlang2, driver)
+#         word.xtlang3 = stress_mark(word.xtlang3, driver)
         
-        if "|" in word.xru1:
-            prompt = f"""Task: Correct the stress mark in the sentence {word.xru1} and paste the corrected sentence.
-Provide only the requested answer
+#         if "|" in word.xtlang1:
+#             prompt = f"""Task: Correct the stress mark in the sentence {word.xtlang1} and paste the corrected sentence.
+# Provide only the requested answer
 
-Example: 
-Она́ сто́ит|стои́т на по́диуме и выступа́ет.
-returns
-Она́ стои́т на по́диуме и выступа́ет."""
-            word.xru1 = ask(prompt)
-        if "|" in word.xru2:
-            prompt = f"""Task: Correct the stress mark in the sentence {word.xru2} and paste the corrected sentence.
-Provide only the requested answer
+# Example: 
+# Она́ сто́ит|стои́т на по́диуме и выступа́ет.
+# returns
+# Она́ стои́т на по́диуме и выступа́ет."""
+#             word.xtlang1 = ask(prompt)
+#         if "|" in word.xtlang2:
+#             prompt = f"""Task: Correct the stress mark in the sentence {word.xtlang2} and paste the corrected sentence.
+# Provide only the requested answer
 
-Example: 
-Она́ сто́ит|стои́т на по́диуме и выступа́ет.
-returns
-Она́ стои́т на по́диуме и выступа́ет."""
-            word.xru2 = ask(prompt)
-        if "|" in word.xru3:
-            prompt = f"""Task: Correct the stress mark in the sentence {word.xru3} and paste the corrected sentence.
-Provide only the requested answer
+# Example: 
+# Она́ сто́ит|стои́т на по́диуме и выступа́ет.
+# returns
+# Она́ стои́т на по́диуме и выступа́ет."""
+#             word.xtlang2 = ask(prompt)
+#         if "|" in word.xtlang3:
+#             prompt = f"""Task: Correct the stress mark in the sentence {word.xtlang3} and paste the corrected sentence.
+# Provide only the requested answer
 
-Example: 
-Она́ сто́ит|стои́т на по́диуме и выступа́ет.
-returns
-Она́ стои́т на по́диуме и выступа́ет."""
-            word.xru3 = ask(prompt)
+# Example: 
+# Она́ сто́ит|стои́т на по́диуме и выступа́ет.
+# returns
+# Она́ стои́т на по́диуме и выступа́ет."""
+#             word.xtlang3 = ask(prompt)
         
-        word.update()
-        print(word.xru1)
+#         word.update()
+#         print(word.xtlang1)
 
-    close_driver(driver)
+#     close_driver(driver)
+
+
+    
