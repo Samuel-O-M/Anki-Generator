@@ -1,4 +1,4 @@
-from scrappers.wikitionary import *
+from scrapers.wikitionary import *
 from flashcardCreator import *
 from chatGPTapi import *
 import random

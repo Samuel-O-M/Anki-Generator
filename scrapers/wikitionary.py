@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def categorize(word, language="Russian"):      
+def categorize(word, language):      
         
     url = 'https://en.wiktionary.org/wiki/' + word
     response = requests.get(url)
@@ -50,8 +50,12 @@ def categorize(word, language="Russian"):
 
 if __name__ == "__main__":
 
-    print(categorize("красивый"))
-    print(categorize("красиво"))
-    print(categorize("красивость"))
-    print(categorize("красив"))
-    print(categorize("они"))
+    print(categorize("bonito", "Spanish"))
+    print(categorize("красивый", "Russian"))
+    print(categorize("beautiful", "English"))
+    print(categorize("schön", "German"))
+
+    print(categorize("coche", "Spanish"))
+    print(categorize("машина", "Russian"))
+    print(categorize("car", "English"))
+    print(categorize("Auto", "German"))
