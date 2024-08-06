@@ -10,7 +10,7 @@ def ask(prompt):
     completion = client.chat.completions.create(
     model="gpt-3.5-turbo",
     messages=[
-        {"role": "system", "content": "You are a language assistant, skilled in creating enlightening examples to teach the russian language."},
+        {"role": "system", "content": "You are a language assistant, skilled in creating enlightening examples to teach every language. You provide concise answers to language-related questions."},
         {"role": "user", "content": prompt}
     ]
     )
