@@ -8,31 +8,31 @@ import re
 
 
 class Word:
-    def __init__(self, top, filename='data/cards.json'):
+    def __init__(self, top, file_name='data/cards.json'):
 
         self._top = str(top)
-        self.filename = filename
+        self.file_name = file_name
 
-        if not os.path.exists(self.filename):
-            with open(self.filename, 'w', encoding='utf-8') as file:
+        if not os.path.exists(self.file_name):
+            with open(self.file_name, 'w', encoding='utf-8') as file:
                 json.dump({}, file)
 
         try:
-            with open(self.filename, 'r', encoding='utf-8') as file:
+            with open(self.file_name, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 if isinstance(self._top, str) and self._top in data:
-                    self._tlang = data[self._top].get("tlang", "")
-                    self.langa = data[self._top].get("langa", "")
-                    self.langb = data[self._top].get("langb", "")
-                    self.xtlang1 = data[self._top].get("xtlang1", "")
-                    self.xtlang2 = data[self._top].get("xtlang2", "")
-                    self.xtlang3 = data[self._top].get("xtlang3", "")
-                    self.xlanga1 = data[self._top].get("xlanga1", "")
-                    self.xlanga2 = data[self._top].get("xlanga2", "")
-                    self.xlanga3 = data[self._top].get("xlanga3", "")
-                    self.xlangb1 = data[self._top].get("xlangb1", "")
-                    self.xlangb2 = data[self._top].get("xlangb2", "")
-                    self.xlangb3 = data[self._top].get("xlangb3", "")
+                    self._word_t = data[self._top].get("word_t", "")
+                    self.word_a = data[self._top].get("word_a", "")
+                    self.word_b = data[self._top].get("word_b", "")
+                    self.example_t_1 = data[self._top].get("example_t_1", "")
+                    self.example_t_2 = data[self._top].get("example_t_2", "")
+                    self.example_t_3 = data[self._top].get("example_t_3", "")
+                    self.example_a_1 = data[self._top].get("example_a_1", "")
+                    self.example_a_2 = data[self._top].get("example_a_2", "")
+                    self.example_a_3 = data[self._top].get("example_a_3", "")
+                    self.example_b_1 = data[self._top].get("example_b_1", "")
+                    self.example_b_2 = data[self._top].get("example_b_2", "")
+                    self.example_b_3 = data[self._top].get("example_b_3", "")
                     self._tag = data[self._top].get("tag", "")
                 else:
                     self.clear()
@@ -41,33 +41,33 @@ class Word:
         except json.JSONDecodeError:
             self.clear()
 
-    def initialize(self, metadata):
-        self._tlang = metadata["words"][int(self._top)-1]
-        category = categorize(self._tlang, metadata["tlang"])
+    def initialize(self, word_t, language_t):
+        self._word_t = word_t
+        category = categorize(word_t, language_t)
         self._tag = category
     
     def clear(self):
-        self._tlang = ""
-        self.langa = ""
-        self.langb = ""
-        self.xtlang1 = ""
-        self.xtlang2 = ""
-        self.xtlang3 = ""
-        self.xlanga1 = ""
-        self.xlanga2 = ""
-        self.xlanga3 = ""
-        self.xlangb1 = ""
-        self.xlangb2 = ""
-        self.xlangb3 = ""
+        self._word_t = ""
+        self.word_a = ""
+        self.word_b = ""
+        self.example_t_1 = ""
+        self.example_t_2 = ""
+        self.example_t_3 = ""
+        self.example_a_1 = ""
+        self.example_a_2 = ""
+        self.example_a_3 = ""
+        self.example_b_1 = ""
+        self.example_b_2 = ""
+        self.example_b_3 = ""
         self._tag = ""
-    
+
     @property
     def top(self):
         return self._top
     
     @property
-    def tlang(self):
-        return self._tlang
+    def word_t(self):
+        return self._word_t
     
     @property
     def tag(self):
@@ -75,61 +75,48 @@ class Word:
 
     def update(self):
         try:
-            with open(self.filename, 'r', encoding='utf-8') as file:
+            with open(self.file_name, 'r', encoding='utf-8') as file:
                 data = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             data = {}
 
         data[self._top] = {
-            "tlang": self.tlang,
-            "langa": self.langa,
-            "langb": self.langb,
-            "xtlang1": self.xtlang1,
-            "xtlang2": self.xtlang2,
-            "xtlang3": self.xtlang3,
-            "xlanga1": self.xlanga1,
-            "xlanga2": self.xlanga2,
-            "xlanga3": self.xlanga3,
-            "xlangb1": self.xlangb1,
-            "xlangb2": self.xlangb2,
-            "xlangb3": self.xlangb3,
+            "word_t": self.word_t,
+            "word_a": self.word_a,
+            "word_b": self.word_b,
+            "example_t_1": self.example_t_1,
+            "example_t_2": self.example_t_2,
+            "example_t_3": self.example_t_3,
+            "example_a_1": self.example_a_1,
+            "example_a_2": self.example_a_2,
+            "example_a_3": self.example_a_3,
+            "example_b_1": self.example_b_1,
+            "example_b_2": self.example_b_2,
+            "example_b_3": self.example_b_3,
             "tag": self.tag
         }
 
-        with open(self.filename, 'w', encoding='utf-8') as file:
+        with open(self.file_name, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-def get_prompt(word, tlang, langa, langb):
+def get_prompt(word, language_t, language_a, language_b):
 
-    if langb != "":
+    if language_b != "":
 
-        prompt = f"""Task: Create one entry of this table with examples and translations for the word {word} in {tlang} to {langa} and {langb}. The examples should have a focus on giving a good context and intuition for the word that is being learned. Paste only the final table.
-Header:
-- Russian: {word} in its original or primitive form
-- English: Translation to English
-- Spanish: Translation to Spanish
-- Russian 1: First sentence or expression
-- Russian 2: Second sentence or expression
-- Russian 3: Third sentence or expression
-- English 1: Translation of Russian 1
-- English 2: Translation of Russian 2
-- English 3: Translation of Russian 3
-- Spanish 1: Translation of Russian 1
-- Spanish 2: Translation of Russian 2
-- Spanish 3: Translation of Russian 3
+        prompt = f"""Task: Create one entry of this table with translations for the word {word} in {language_t} to {language_a} and {language_b}. Provide examples, which should have a focus on giving a good context and intuition for the word that is being learned. In the examples, highlight the word, for example **{word}**. Do not highlight it outside of the examples. Paste only the final table.
 
-Example:
-| {tlang}   | {langa}  | {langb}   | {tlang} 1                        | {tlang} 2                    | {tlang} 3                      | {langa} 1                    | {langa} 2                    | {langa} 3                      | {langb} 1                      | {langb} 2                    | {langb} 3                      |
-|-----------|----------|-----------|----------------------------------|------------------------------|--------------------------------|------------------------------|------------------------------|--------------------------------|--------------------------------|------------------------------|--------------------------------|
+Table: 
+| {language_t}   | {language_a}  | {language_b}  | Example {language_t} 1                        | Example {language_t} 2                    | Example {language_t} 3                      | Example {language_a} 1                    | Example {language_a} 2                    | Example {language_a} 3                      | Example {language_b} 1                    | Example {language_b} 2                    | Example {language_b} 3                      |
+|-----------|----------|----------|----------------------------------|------------------------------|--------------------------------|------------------------------|------------------------------|--------------------------------|-----------------------------|------------------------------|--------------------------------|
 """
     else:
 
-        prompt = f"""Task: Create one entry of this table with translations for the word {word} in {tlang} to {langa}. Provide examples, which should have a focus on giving a good context and intuition for the word that is being learned. Paste only the final table.
+        prompt = f"""Task: Create one entry of this table with translations for the word {word} in {language_t} to {language_a}. Provide examples, which should have a focus on giving a good context and intuition for the word that is being learned. In the examples, highlight the word, for example **{word}**. Do not highlight it outside of the examples. Paste only the final table.
 
 Table: 
-| {tlang}   | {langa}  | {langb}   | Example {tlang} 1                        | Example {tlang} 2                    | Example {tlang} 3                      | Example {langa} 1                    | Example {langa} 2                    | Example {langa} 3                      |                   |
-|-----------|----------|-----------|----------------------------------|------------------------------|--------------------------------|------------------------------|------------------------------|--------------------------------|
+| {language_t}   | {language_a}  | Example {language_t} 1                        | Example {language_t} 2                    | Example {language_t} 3                      | Example {language_a} 1                    | Example {language_a} 2                    | Example {language_a} 3                      |
+|-----------|----------|----------------------------------|------------------------------|--------------------------------|------------------------------|------------------------------|--------------------------------|
 """
     return prompt 
 
@@ -140,15 +127,17 @@ def normalize_input(input_string):
     return elements
 
 
-
-
 if __name__ == "__main__":
 
-    # INPUT
-    with open('input.txt', 'r', encoding='utf-8') as file:
-        words = file.read()
 
-    normalized_words = normalize_input(words)
+    # INPUT
+
+    with open('input.txt', 'r', encoding='utf-8') as file:
+        read_words = file.read()
+
+    normalized_words = normalize_input(read_words)
+    words = [word for word in normalized_words if word]
+    length = len(words)
 
 #     proceed = input(f"""
 # The following words will be processed: {normalized_words}
@@ -161,90 +150,107 @@ if __name__ == "__main__":
     # if name == "":
     #     name = "deck"
     name = "deck"
+    file_name = f'data/{name}.json'
     
-    # tlang = ""
-    # while tlang == "":
-    #     tlang = input("Enter the target language: ")
-    #     if tlang == "":
+    # language_t = ""
+    # while language_t == "":
+    #     language_t = input("Enter the target language: ")
+    #     if language_t == "":
     #         print("Target language is required.")
-    #     if tlang.lower() == "exit":
+    #     if language_t.lower() == "exit":
     #         exit()
-    # tlang = tlang[0].upper() + tlang[1:].lower()
+    # language_t = language_t[0].upper() + language_t[1:].lower()
 
-    # langa = ""
-    # while langa == "":
-    #     langa = input("Enter the first language: ")
-    #     if langa == "":
+    # language_a = ""
+    # while language_a == "":
+    #     language_a = input("Enter the first language: ")
+    #     if language_a == "":
     #         print("First language is required.")
-    #     if langa.lower() == "exit":
+    #     if language_a.lower() == "exit":
     #         exit()
-    # langa = langa[0].upper() + langa[1:].lower()
+    # language_a = language_a[0].upper() + language_a[1:].lower()
     
-    # langb = input("Enter the second language: ")
-    # if langb.lower() == "exit":
+    # language_b = input("Enter the second language: ")
+    # if language_b.lower() == "exit":
     #     exit()
-    # if langb != "":
-    #     langb = langb[0].upper() + langb[1:].lower()
+    # if language_b != "":
+    #     language_b = language_b[0].upper() + language_b[1:].lower()
     
-    tlang = "Spanish"
-    langa = "English"
-    langb = ""
+    language_t = "Spanish"
+    language_a = "English"
+    language_b = "French"
 
-    metadata = {
-        "words": normalized_words,
-        "length": len(normalized_words),
-        "name": name,
-        "filename": f'data/{name}.json',
-        "tlang": tlang,
-        "langa": langa,
-        "langb": langb,
-    }
 
     # INITIALIZATION
-    for i in range(metadata["length"]):
-        word = Word(i+1, metadata["filename"])
-        word.initialize(metadata)
+
+    for i in range(length):
+        word = Word(i+1, file_name)
+        word.initialize(words[i], language_t)
         word.update()
-        if i % 20 == 0:
-            print(f"{i} words processed")
+        if i % 50 == 0 and i != 0:
+            print(f"{i} words initialized")
+
 
     # CREATION
+
+    for i in range(length):
+
+        word = Word(i+1, file_name)
+        prompt = get_prompt(word.word_t, language_t, language_a, language_b)
+        response = ask(prompt)
+        print(response+"\n"*3)
+
+        if language_b != "":
+            data_row = response.split("-|")[-1].strip()
+            
+            data_array = data_row.split("|")
+
+            word.word_a = data_array[2].strip()
+            word.word_b = data_array[3].strip()
+            word.example_t_1 = data_array[4].strip()
+            word.example_t_2 = data_array[5].strip()
+            word.example_t_3 = data_array[6].strip()
+            word.example_a_1 = data_array[7].strip()
+            word.example_a_2 = data_array[8].strip()
+            word.example_a_3 = data_array[9].strip()
+            word.example_b_1 = data_array[10].strip()
+            word.example_b_2 = data_array[11].strip()
+            word.example_b_3 = data_array[12].strip()
+
+        else: 
+            data_row = response.split("-|")[-1].strip()
+            
+            data_array = data_row.split("|")
+
+            word.word_a = data_array[2].strip()
+            word.example_t_1 = data_array[3].strip()
+            word.example_t_2 = data_array[4].strip()
+            word.example_t_3 = data_array[5].strip()
+            word.example_a_1 = data_array[6].strip()
+            word.example_a_2 = data_array[7].strip()
+            word.example_a_3 = data_array[8].strip()
         
+        word.update()
 
-    # for i in range(483,484):
-    #     word = Word(i)
+        if i % 50 == 0 and i != 0:
+            print(f"{i} words created")
 
-    #     prompt = get_prompt(word.tlang, word.tag)
-
-    #     response = ask(prompt)
-
-    #     data_row = response.split("-|")[-1].strip()
-        
-    #     data_array = data_row.split("|")
-
-    #     word.langa = data_array[2].strip()
-    #     word.langb = data_array[3].strip()
-    #     word.xtlang1 = data_array[4].strip()
-    #     word.xtlang2 = data_array[5].strip()
-    #     word.xtlang3 = data_array[6].strip()
-    #     word.xlanga1 = data_array[7].strip()
-    #     word.xlanga2 = data_array[8].strip()
-    #     word.xlanga3 = data_array[9].strip()
-    #     word.xlangb1 = data_array[10].strip()
-    #     word.xlangb2 = data_array[11].strip()
-    #     word.xlangb3 = data_array[12].strip()
-
-    #     word.update()
-
-    #     if i % 50 == 0:
-    #         print(f"{i} words processed")
 
     # CONVERSION
 
-    # table = []
-    # for i in range(1,501):
-    #     word = Word(i)
-    #     row = [word.top, word.tlang, "", word.langa, word.langb, word.xtlang1, word.xtlang2, word.xtlang3, "", "", "", word.xlanga1, word.xlanga2, word.xlanga3, word.xlangb1, word.xlangb2, word.xlangb3, word.tag]
-    #     table.append(row)
+    if language_b != "":
+        header = ["Top", {language_t}, "Audio", {language_a}, {language_b}, f"Example {language_t} 1", f"Example {language_t} 2", f"Example {language_t} 3", "Audio 1", "Audio 2", "Audio 3", f"Example {language_a} 1", f"Example {language_a} 2", f"Example {language_a} 3", f"Example {language_b} 1", f"Example {language_b} 2", f"Example {language_b} 3", "Tag"]
+    else:
+        header = ["Top", {language_t}, "Audio", {language_a}, "", f"Example {language_t} 1", f"Example {language_t} 2", f"Example {language_t} 3", "Audio 1", "Audio 2", "Audio 3", f"Example {language_a} 1", f"Example {language_a} 2", f"Example {language_a} 3", "", "", "", "Tag"]
 
-    # create_flashcards(table)
+    
+    content = []
+
+    for i in range(length):
+        word = Word(i+1, file_name)
+
+        row = [word.top, word.word_t, "", word.word_a, word.word_b, word.example_t_1, word.example_t_2, word.example_t_3, "", "", "", word.example_a_1, word.example_a_2, word.example_a_3, word.example_b_1, word.example_b_2, word.example_b_3, word.tag]
+
+        content.append(row)
+    
+    create_flashcards(header, content)
